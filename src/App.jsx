@@ -1,11 +1,26 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./App.css";
 
 function Header() {
+	const [search, setSearch] = useState(null);
+
 	return (
 		<div id="header">
-			<a href="#">Hello</a>
+			<Link to="/" className="logo">
+				SR
+			</Link>
+			<Link to="/">Kanaler</Link>
+			<Link to="/program">Program</Link>
+			<input
+				type="text"
+				id="search"
+				placeholder="Sök program..."
+				value={search}
+				onChange={(e) => {
+					handleSearchInput(e);
+				}}
+			/>
 		</div>
 	);
 }
@@ -32,6 +47,7 @@ function ChannelPage({ setAudio, channels }) {
 
 	function handleChanPlay(e, id) {
 		e.stopPropagation();
+		const blurElement = document.querySelector("#colorblur");
 		const target = e.target;
 		const isPaused = target.classList.contains("pause");
 
@@ -39,16 +55,19 @@ function ChannelPage({ setAudio, channels }) {
 			btn.classList.remove("pause");
 		});
 
-		if (isPaused) {
-			target.classList.remove("pause");
-		} else {
-			target.classList.add("pause");
-		}
-
 		fetchChannels(id).then((data) => {
 			console.log(data.channel);
-			setAudio(data.channel); // Set channels state
+			if (isPaused) {
+				target.classList.remove("pause");
+				blurElement.style.background = "gray";
+				setAudio(null);
+			} else {
+				target.classList.add("pause");
+				blurElement.style.background = "#" + data.channel.color;
+				setAudio(data.channel); // Set channels state
+			}
 		});
+
 		console.log("Play audio for channel ID:", id);
 	}
 
@@ -58,7 +77,7 @@ function ChannelPage({ setAudio, channels }) {
 
 	return (
 		<div id="channels">
-			<h1>Channels</h1>
+			<h1>Kanaler</h1>
 			{channels.map((chan, index) => (
 				<div
 					className="channel"
@@ -119,7 +138,8 @@ function App() {
 		<>
 			<Header />
 			<ChannelPage channels={channels} setAudio={setAudio} />
-			<Player audio={audio} setAudio={setAudio} /> {/* Pass 'audio' as a prop */}
+			<Player audio={audio} setAudio={setAudio} />
+			<div id="colorblur"></div>
 		</>
 	);
 }

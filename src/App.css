@@ -1,7 +1,9 @@
 body {
 	background: Black;
 	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 4rem;
 }
+
 #channels {
 	padding: 2rem;
 	display: flex;
@@ -23,6 +25,7 @@ body {
 }
 
 .channel span {
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: 0.75rem;
 	padding: 0.3rem 0.5rem;
 	color: white;
@@ -86,6 +89,72 @@ body {
 	}
 }
 
+#header {
+	top: 0;
+	left: 0;
+	height: 4rem;
+	border-bottom: 1px solid rgb(37, 37, 37);
+	display: flex;
+	align-items: center;
+	position: fixed;
+	z-index: 30000;
+	width: 100%;
+	backdrop-filter: blur(3rem);
+}
+
+#header a {
+	font-family: "Poppins", sans-serif;
+	color: white;
+	font-weight: bold;
+	text-decoration: none;
+	opacity: 0.5;
+	padding: 1.4rem;
+}
+
+#header a:hover {
+	opacity: 1;
+}
+
+#header input {
+	font-family: "Archivo", sans-serif;
+	font-weight: 400;
+	font-size: 1rem;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #222222;
+	border: none;
+	padding: 0.9rem;
+	width: 20rem;
+	border-radius: 0.4rem;
+	color: white;
+}
+
+.logo {
+	margin-right: 1rem;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-weight: bold;
+	width: 2.5rem;
+	height: 2.5rem;
+	font-size: 1.7rem;
+	padding: 0;
+	padding-top: 0.2rem;
+	border-radius: 5rem;
+	margin-left: 1rem;
+	border: 5px solid rgb(59, 59, 59);
+}
+
+.logo:hover {
+	cursor: pointer;
+	background: white;
+	color: black !important;
+	border: 5px solid white;
+}
+
 #player {
 	display: flex;
 	align-items: center;
@@ -96,10 +165,13 @@ body {
 	background: white;
 	padding: 0.2rem;
 	z-index: 2000;
+	filter: invert(1);
+	border-top: 1px solid rgb(199, 199, 199);
 }
 
 .playerthumb {
 	width: 4rem;
+	filter: invert(1);
 }
 
 .playerthumb img {
@@ -110,6 +182,7 @@ body {
 /* Styling the default audio controls */
 
 h1 {
+	font-family: "Archivo", sans-serif;
 	font-size: 3rem;
 	display: block;
 	width: 100%;
@@ -117,6 +190,20 @@ h1 {
 	border-bottom: 1px solid rgb(33, 33, 33);
 	margin-bottom: 1rem;
 	padding-bottom: 1rem;
+}
+
+#colorblur {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 60vw;
+	height: 60vw;
+	background: gray;
+	border-radius: 100%;
+	transform: translateX(-50%) translateY(-50%);
+	z-index: -1;
+	opacity: 0.2;
+	filter: blur(10rem);
 }
 audio {
 	width: 100%;
