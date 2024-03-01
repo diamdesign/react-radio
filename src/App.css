@@ -1,0 +1,174 @@
+body {
+	background: Black;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#channels {
+	padding: 2rem;
+	display: flex;
+	flex-wrap: wrap;
+
+	justify-content: left;
+
+	gap: 1rem;
+}
+
+.channel {
+	position: relative;
+	padding-bottom: 1rem;
+}
+
+.channel:hover {
+	cursor: pointer;
+	animation: flash 0.33s ease-out 1 forwards;
+}
+
+.channel span {
+	font-size: 0.75rem;
+	padding: 0.3rem 0.5rem;
+	color: white;
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 0.5rem;
+	position: absolute;
+	bottom: 0.5rem;
+	right: 0.5rem;
+	opacity: 0;
+}
+
+.channel:hover span {
+	opacity: 1;
+}
+
+.image {
+	width: 200px;
+}
+
+.image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.chanplaybtn {
+	background-image: url("../img/icon-play.svg");
+	background-size: 1.4rem;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 3rem;
+	height: 2rem;
+	filter: invert(1);
+	position: absolute;
+	bottom: 0.5rem;
+	z-index: 1;
+	opacity: 0.5;
+}
+
+.channel:hover .chanplaybtn {
+	opacity: 1;
+}
+
+.pause {
+	background-image: url("../img/icon-pause.svg");
+	background-size: 1rem;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.chanplaybtn:hover {
+	cursor: pointer;
+	scale: 1.2;
+}
+@keyframes flash {
+	0% {
+		filter: brightness(2);
+	}
+	100% {
+		filter: brightness(1);
+	}
+}
+
+#player {
+	display: flex;
+	align-items: center;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: white;
+	padding: 0.2rem;
+	z-index: 2000;
+}
+
+.playerthumb {
+	width: 4rem;
+}
+
+.playerthumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+/* Styling the default audio controls */
+
+audio {
+	width: 100%;
+	background: white;
+	background-color: white;
+}
+/* Styling the entire audio controls panel */
+audio::-webkit-media-controls-panel {
+	/* Example styles */
+	background-color: white;
+	color: #000;
+	border-radius: 0px;
+	width: 100%;
+}
+
+/* Styling specific elements within the audio controls */
+
+/* Play/pause button */
+audio::-webkit-media-controls-play-button {
+	/* Example styles */
+	background-color: transparent;
+	color: #fff;
+}
+
+/* Mute/unmute button */
+audio::-webkit-media-controls-mute-button {
+	/* Example styles */
+	background-color: transparent;
+	color: #fff;
+}
+
+/* Volume slider */
+audio::-webkit-media-controls-volume-slider {
+	/* Example styles */
+	background-color: transparent;
+}
+
+/* Current time and duration display */
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+	/* Example styles */
+	background-color: transparent;
+	color: #000;
+}
+
+/* Seek bar */
+audio::-webkit-media-controls-seek-back-button,
+audio::-webkit-media-controls-seek-forward-button,
+audio::-webkit-media-controls-time-remaining-display {
+	/* Example styles */
+
+	background-color: transparent;
+	color: #fff;
+}
+
+/* Fullscreen button */
+audio::-webkit-media-controls-fullscreen-button {
+	/* Example styles */
+
+	background-color: transparent;
+	color: #fff;
+}
+
+/* Additional styling for other audio controls elements can be added similarly */
