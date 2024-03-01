@@ -58,6 +58,7 @@ function ChannelPage({ setAudio, channels }) {
 
 	return (
 		<div id="channels">
+			<h1>Channels</h1>
 			{channels.map((chan, index) => (
 				<div
 					className="channel"

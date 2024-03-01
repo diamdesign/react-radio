@@ -109,6 +109,15 @@ body {
 }
 /* Styling the default audio controls */
 
+h1 {
+	font-size: 3rem;
+	display: block;
+	width: 100%;
+	color: white;
+	border-bottom: 1px solid rgb(33, 33, 33);
+	margin-bottom: 1rem;
+	padding-bottom: 1rem;
+}
 audio {
 	width: 100%;
 	background: white;
