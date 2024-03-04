@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Routes, Route, useNavigate, Link, useParams } from "react-router-dom";
 import "./App.css";
 
 function Header() {
@@ -42,12 +42,14 @@ async function fetchChannels(id = "") {
 	}
 }
 
+const blurElement = document.querySelector("#colorblur");
+
 function ChannelPage({ setAudio, channels }) {
 	const navigate = useNavigate();
 
 	function handleChanPlay(e, id) {
 		e.stopPropagation();
-		const blurElement = document.querySelector("#colorblur");
+
 		const target = e.target;
 		const isPaused = target.classList.contains("pause");
 
@@ -97,6 +99,31 @@ function ChannelPage({ setAudio, channels }) {
 	);
 }
 
+function ChannelDetails({ setAudio, channels }) {
+	let { channelId } = useParams();
+	console.log(channelId);
+	// Filter the channels array to find the channel with the matching ID
+	const selectedChannel = channels.filter((channel) => channel.id === parseInt(channelId));
+	console.log(selectedChannel);
+
+	blurElement.style.background = "#" + selectedChannel[0].color;
+
+	return (
+		<div id="channels">
+			<div id="top">
+				<div className="channel-image">
+					<img src={selectedChannel[0].image} />
+				</div>
+				<div className="channel-info">
+					<h1>{selectedChannel[0].name}</h1>
+					<span>{selectedChannel[0].channeltype}</span>
+					<div className="chanplaybtn" onClick={(e) => handleChanPlay(e, chan.id)}></div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 function Player({ audio }) {
 	const audioRef = useRef(null);
 
@@ -137,7 +164,16 @@ function App() {
 	return (
 		<>
 			<Header />
-			<ChannelPage channels={channels} setAudio={setAudio} />
+			<Routes>
+				<Route
+					path="/"
+					element={<ChannelPage channels={channels} setAudio={setAudio} />}
+				></Route>
+				<Route
+					path="/channel/:channelId"
+					element={<ChannelDetails channels={channels} setAudio={setAudio} />}
+				></Route>
+			</Routes>
 			<Player audio={audio} setAudio={setAudio} />
 			<div id="colorblur"></div>
 		</>

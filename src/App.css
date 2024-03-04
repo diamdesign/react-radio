@@ -190,7 +190,7 @@ h1 {
 	display: block;
 	width: 100%;
 	color: white;
-	border-bottom: 1px solid rgb(33, 33, 33);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	margin-bottom: 1rem;
 	padding-bottom: 1rem;
 }
@@ -299,4 +299,39 @@ audio::-webkit-media-controls-fullscreen-button {
 	color: #fff;
 }
 
-/* Additional styling for other audio controls elements can be added similarly */
+#top {
+	display: flex;
+	width: 100%;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#top h1 {
+	border-bottom: none;
+}
+.channel-image {
+	width: 10rem;
+	margin-right: 2rem;
+}
+
+.channel-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.channel-info {
+	position: relative;
+}
+
+.channel-info .chanplaybtn {
+	border: 1px solid rgba(0, 0, 0, 0.2) !important;
+	height: 3rem;
+	border-radius: 0.3rem;
+}
+
+.channel-info .chanplaybtn:hover {
+	scale: 1;
+	cursor: pointer;
+	opacity: 1;
+}
