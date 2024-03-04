@@ -253,7 +253,7 @@ function ChannelDetails({ setAudio, channels }) {
 								<h2>{item.program.name}</h2>
 								<p>{item.description}</p>
 								<p>
-									<span>Från: {formatTime(item.starttimeutc)}</span> <br />
+									<span>Från: {formatTime(item.starttimeutc)}</span>
 									<span>Till: {formatTime(item.endtimeutc)}</span>
 								</p>
 							</div>

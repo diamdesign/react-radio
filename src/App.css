@@ -431,7 +431,7 @@ audio::-webkit-media-controls-fullscreen-button {
 	font-family: "Archivo", sans-serif;
 	color: white;
 	font-weight: 500;
-	font-size: 1.2rem;
+	font-size: 1.4rem;
 }
 
 .schedule-item p {
@@ -439,15 +439,18 @@ audio::-webkit-media-controls-fullscreen-button {
 	color: white;
 	font-size: 0.9rem;
 	margin-top: 0.5rem;
+	color: rgba(255, 255, 255, 0.5);
 }
 
 .schedule-item span {
+	color: rgba(255, 255, 255, 1);
 	margin-top: 0.2rem;
 	display: inline-block;
 	padding: 0.4rem 0.8rem;
 	font-size: 0.7rem;
 	background: rgb(66, 66, 66);
 	border-radius: 0.3rem;
+	margin-right: 0.5rem;
 }
 .schedule-item span:nth-child(1) {
 	background: rgba(65, 105, 225, 0.5);
