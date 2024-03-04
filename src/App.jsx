@@ -47,7 +47,7 @@ async function fetchChannels(id = "") {
 	}
 }
 
-const blurElement = document.querySelector("#colorblur");
+let blurElement = document.querySelector("#colorblur");
 
 function ChannelPage({ setAudio, channels }) {
 	const navigate = useNavigate();
@@ -70,6 +70,7 @@ function ChannelPage({ setAudio, channels }) {
 				setAudio(null);
 			} else {
 				target.classList.add("pause");
+				blurElement = document.querySelector("#colorblur");
 				blurElement.style.background = "#" + data.channel.color;
 				setAudio(data.channel); // Set channels state
 			}
