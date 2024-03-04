@@ -31,7 +31,7 @@ body {
 	padding: 0.3rem 0.5rem;
 	color: white;
 	background: rgba(0, 0, 0, 0.5);
-	border-radius: 0.5rem;
+	border-radius: 0.3rem;
 	position: absolute;
 	bottom: 0.5rem;
 	right: 0.5rem;
@@ -132,7 +132,9 @@ body {
 	border-radius: 0.4rem;
 	color: white;
 }
-
+#header input:-webkit-autofill {
+	color: white;
+}
 .logo {
 	margin-right: 1rem;
 	text-align: center;
@@ -205,7 +207,7 @@ h1 {
 	border-radius: 100%;
 	transform: translateX(-50%) translateY(-50%);
 	z-index: -1;
-	opacity: 0.2;
+	opacity: 0.33;
 	filter: blur(10rem);
 }
 
@@ -308,9 +310,13 @@ audio::-webkit-media-controls-fullscreen-button {
 
 #top h1 {
 	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 .channel-image {
-	width: 10rem;
+	aspect-ratio: 1/1;
+	min-width: 16rem;
+	width: 16rem;
 	margin-right: 2rem;
 }
 
@@ -324,14 +330,160 @@ audio::-webkit-media-controls-fullscreen-button {
 	position: relative;
 }
 
+.channel-info .buttons {
+	display: flex;
+}
+
 .channel-info .chanplaybtn {
 	border: 1px solid rgba(0, 0, 0, 0.2) !important;
 	height: 3rem;
 	border-radius: 0.3rem;
+
+	width: 3rem;
+	height: 3rem;
+	margin-top: 1rem;
+	position: relative;
+	bottom: 0;
+	z-index: 1;
+	opacity: 0.5;
 }
 
-.channel-info .chanplaybtn:hover {
+.channel-info .chanplaybtn:hover,
+.channel-info .website:hover {
 	scale: 1;
 	cursor: pointer;
 	opacity: 1;
+}
+
+.channel-info span,
+.channel-info p {
+	color: white;
+	max-width: 40rem;
+	max-height: 6.2rem;
+	overflow: hidden;
+}
+.channel-info span {
+	background: gray;
+	padding: 0.2rem 0.5rem;
+	border-radius: 0.3rem;
+	font-size: 0.8rem;
+	margin-top: 0.5rem;
+}
+.channel-info p {
+	margin-top: 1rem;
+}
+
+.channel-info .website {
+	border: 1px solid rgba(255, 255, 255, 0.2) !important;
+	height: 3rem;
+	color: white;
+	border-radius: 0.3rem;
+	line-height: 3rem;
+	padding: 0 1rem;
+	margin-left: 0.5rem;
+	height: 3rem;
+	margin-top: 1rem;
+	position: relative;
+	bottom: 0;
+	z-index: 1;
+	opacity: 0.5;
+}
+
+#schedule {
+	position: relative;
+	overflow-y: scroll;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+	width: 100%;
+	min-width: 100%;
+	min-height: calc(100vh - 27rem);
+	height: calc(100vh - 27rem);
+	max-height: calc(100vh - 27rem);
+	padding-bottom: 4rem;
+}
+
+.schedule-image {
+	width: 10rem;
+	min-width: 10rem;
+}
+
+.schedule-image img {
+	width: 100%;
+	aspect-ratio: 1/1;
+	background-color: rgba(255, 255, 255, 0.1);
+	border: none;
+}
+
+.schedule-item {
+	display: flex;
+	gap: 2rem;
+	opacity: 0.4;
+	filter: grayscale(1);
+	transition: opacity 0.4s ease-in-out, grayscale 0.4s ease-in-out;
+}
+
+.schedule-item:hover {
+	filter: grayscale(0);
+	opacity: 1;
+}
+
+.schedule-item h2 {
+	font-family: "Archivo", sans-serif;
+	color: white;
+	font-weight: 500;
+	font-size: 1.2rem;
+}
+
+.schedule-item p {
+	max-width: 50rem;
+	color: white;
+	font-size: 0.9rem;
+	margin-top: 0.5rem;
+}
+
+.schedule-item span {
+	margin-top: 0.2rem;
+	display: inline-block;
+	padding: 0.4rem 0.8rem;
+	font-size: 0.7rem;
+	background: rgb(66, 66, 66);
+	border-radius: 0.3rem;
+}
+.schedule-item span:nth-child(1) {
+	background: rgba(65, 105, 225, 0.5);
+}
+
+#scheduleloader {
+	position: absolute;
+	content: "";
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 0.4rem;
+	width: 80px;
+	height: 80px;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	z-index: 1;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+	width: 50px;
+	padding: 8px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background: #25b09b;
+	--_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
+	-webkit-mask: var(--_m);
+	mask: var(--_m);
+	-webkit-mask-composite: source-out;
+	mask-composite: subtract;
+	animation: l3 1s infinite linear;
+}
+@keyframes l3 {
+	to {
+		transform: rotate(1turn);
+	}
 }

@@ -1,9 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createElement } from "react";
 import { Routes, Route, useNavigate, Link, useParams } from "react-router-dom";
 import "./App.css";
 
 function Header() {
-	const [search, setSearch] = useState(null);
+	const [search, setSearch] = useState("");
+
+	function handleSearchInput(e) {
+		e.preventDefault();
+		setSearch(e.target.value);
+	}
 
 	return (
 		<div id="header">
@@ -99,26 +104,161 @@ function ChannelPage({ setAudio, channels }) {
 	);
 }
 
+function formatTime(inputDate) {
+	// Extract the number of milliseconds from the date string
+	const milliseconds = parseInt(inputDate.match(/\d+/)[0]);
+
+	// Create a new Date object using the milliseconds
+	const date = new Date(milliseconds);
+
+	// Format the date as desired (e.g., using toLocaleString())
+	const formattedDate = date.toLocaleString();
+	return formattedDate;
+}
+
 function ChannelDetails({ setAudio, channels }) {
 	let { channelId } = useParams();
-	console.log(channelId);
-	// Filter the channels array to find the channel with the matching ID
-	const selectedChannel = channels.filter((channel) => channel.id === parseInt(channelId));
-	console.log(selectedChannel);
 
-	blurElement.style.background = "#" + selectedChannel[0].color;
+	const [page, setPage] = useState(1);
+	const [isLoading, setIsLoading] = useState(true);
+	const [channelData, setChannelData] = useState(null);
+	const [scheduleData, setSchedule] = useState(null);
+
+	function handleChanPlay(e, id) {
+		e.stopPropagation();
+
+		const target = e.target;
+		const isPaused = target.classList.contains("pause");
+
+		fetchChannels(id).then((data) => {
+			console.log(data.channel);
+			if (isPaused) {
+				target.classList.remove("pause");
+				setAudio(null);
+			} else {
+				target.classList.add("pause");
+				setAudio(data.channel); // Set channels state
+			}
+		});
+
+		console.log("Play audio for channel ID:", id);
+	}
+
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const pageParam = params.get("page");
+		const currentPage = pageParam ? parseInt(pageParam) : 1;
+		setPage(currentPage);
+
+		const fetchData = async () => {
+			try {
+				let allEpisodes = [];
+				const data = await fetchChannels(channelId);
+				setChannelData(data);
+
+				// Fetch the first page to get total number of pages
+				const firstPageUrl = `https://api.sr.se/v2/scheduledepisodes?channelid=${channelId}&format=json`;
+				const firstResponse = await fetch(firstPageUrl);
+				const firstData = await firstResponse.json();
+
+				// Get the total number of pages from the pagination data
+				const totalPages = firstData.pagination.totalpages;
+
+				// Add episodes from the first page to the array
+				allEpisodes = allEpisodes.concat(firstData.schedule);
+
+				// Fetch remaining pages and add their episodes to the array
+				for (let page = 2; page <= totalPages; page++) {
+					const pageUrl = `https://api.sr.se/v2/scheduledepisodes?channelid=${channelId}&format=json&page=${page}`;
+					const response = await fetch(pageUrl);
+					const data = await response.json();
+					allEpisodes = allEpisodes.concat(data.schedule);
+				}
+
+				// Get the current time
+				const currentTime = new Date();
+				const year = currentTime.getFullYear();
+				const month = String(currentTime.getMonth() + 1).padStart(2, "0"); // Adding 1 to month since January is 0
+				const day = String(currentTime.getDate()).padStart(2, "0");
+				const hour = String(currentTime.getHours()).padStart(2, "0");
+				const minute = String(currentTime.getMinutes()).padStart(2, "0");
+				const second = String(currentTime.getSeconds()).padStart(2, "0");
+
+				const formattedCurrentTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+				// Filter out episodes whose end time is greater than the current time
+				const filteredSchedule = allEpisodes.filter((episode) => {
+					const endTime = formatTime(episode.endtimeutc);
+					// Create a new Date object using the milliseconds
+					return endTime > formattedCurrentTime;
+				});
+				setSchedule(filteredSchedule);
+				setIsLoading(false);
+
+				return data;
+			} catch (error) {
+				console.error("Error fetching data:", error);
+				setIsLoading(false);
+			}
+		};
+
+		fetchData().then((data) => {
+			// Ensure data is not null before accessing its properties
+			const blurElement = document.getElementById("colorblur");
+			blurElement.style.background = "#" + data.channel.color;
+		});
+	}, [channelId]);
 
 	return (
 		<div id="channels">
-			<div id="top">
-				<div className="channel-image">
-					<img src={selectedChannel[0].image} />
+			{channelData && ( // Render JSX only when channelData is available
+				<div id="top">
+					<div className="channel-image">
+						<img src={channelData.channel.image} />
+					</div>
+					<div className="channel-info">
+						<h1>{channelData.channel.name}</h1>
+						<span>{channelData.channel.channeltype}</span>
+						<p>{channelData.channel.tagline}</p>
+						<div className="buttons">
+							<div
+								className="chanplaybtn"
+								onClick={(e) => handleChanPlay(e, channelData.channel.id)}
+							></div>
+							<a
+								className="website"
+								href={channelData.channel.siteurl}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Hemsida
+							</a>
+						</div>
+					</div>
 				</div>
-				<div className="channel-info">
-					<h1>{selectedChannel[0].name}</h1>
-					<span>{selectedChannel[0].channeltype}</span>
-					<div className="chanplaybtn" onClick={(e) => handleChanPlay(e, chan.id)}></div>
-				</div>
+			)}
+			<div id="schedule">
+				{isLoading && (
+					<div id="scheduleloader">
+						<div className="loader"></div>
+					</div>
+				)}
+				{!isLoading &&
+					scheduleData.map((item, index) => (
+						<div className="schedule-item" key={index}>
+							<div className="schedule-image">
+								<img src={item.imageurl} />
+							</div>
+							<div className="schedule-info">
+								<h2>{item.program.name}</h2>
+								<p>{item.description}</p>
+								<p>
+									<span>Från: {formatTime(item.starttimeutc)}</span> <br />
+									<span>Till: {formatTime(item.endtimeutc)}</span>
+								</p>
+							</div>
+						</div>
+					))}
 			</div>
 		</div>
 	);
