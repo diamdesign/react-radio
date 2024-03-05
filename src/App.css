@@ -11,7 +11,7 @@ body {
 	justify-content: left;
 	gap: 1rem;
 	max-height: 93vh;
-	padding-bottom: 7rem;
+	padding-bottom: 3rem;
 	overflow-y: auto;
 }
 

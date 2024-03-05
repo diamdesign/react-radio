@@ -185,7 +185,7 @@ function StartPage({ setAudio }) {
 	return (
 		<div id="channels">
 			<div className="chancontainer">
-				{favoriteChan && favoriteChan.length > 0 && (
+				{favoriteChan && favoriteChan.length > 0 ? (
 					<>
 						<h1>Favorit kanaler</h1>
 						{favchannels.map((chan, index) => (
@@ -211,6 +211,8 @@ function StartPage({ setAudio }) {
 							</div>
 						))}
 					</>
+				) : (
+					<>{navigate("/kanaler/")}</>
 				)}
 				<h1>Favorit program</h1>
 				{schedule && schedule.length > 0 && (
