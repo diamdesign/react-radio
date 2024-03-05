@@ -237,6 +237,12 @@ h1 {
 	margin-top: 3rem;
 }
 
+h1 span {
+	font-size: 1rem;
+	font-weight: 400;
+	opacity: 0.5;
+}
+
 h1:first-child {
 	margin-top: 0;
 }
@@ -534,4 +540,60 @@ audio::-webkit-media-controls-fullscreen-button {
 	to {
 		transform: rotate(1turn);
 	}
+}
+
+#tabla {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: auto;
+	color: white;
+	max-height: 80vh;
+}
+
+.tabla-item {
+	display: flex;
+	flex-direction: row;
+}
+
+.rowheader {
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 0.3rem;
+	font-weight: 700;
+	font-size: 1.4rem;
+	margin-bottom: 1rem;
+	padding: 0.3rem 1rem;
+	margin-right: 1rem;
+	position: sticky;
+	left: 0;
+	backdrop-filter: blur(1rem);
+	z-index: 10;
+}
+
+.tabla-program {
+	padding: 1rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+}
+.tabla-item .image {
+	margin: 0;
+	width: 10rem;
+}
+
+.tabla-item .description {
+	font-size: 0.8rem;
+	opacity: 0.5;
+}
+
+.tabla-item span {
+	background: rgb(72, 72, 72);
+	padding: 0.2rem 0.5rem;
+	border-radius: 0.3rem;
+	font-size: 0.65rem;
+	margin-top: 0.5rem;
+	display: inline-block;
+	opacity: 0.7;
 }

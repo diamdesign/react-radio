@@ -50,7 +50,10 @@ async function fetchChannels(id = "") {
 let blurElement = document.querySelector("#colorblur");
 
 var favoriteChan = [];
-function getFavoriteChanFromLocalStorage() {
+var favoriteProg = [];
+var scheduleProg = [];
+
+function getFromLocalStorage() {
 	const favoriteChanString = localStorage.getItem("favoriteChan");
 	if (favoriteChanString) {
 		return JSON.parse(favoriteChanString);
@@ -63,24 +66,70 @@ function saveFavChan() {
 	localStorage.setItem("favoriteChan", JSON.stringify(favoriteChan));
 }
 
-favoriteChan = getFavoriteChanFromLocalStorage();
+favoriteChan = getFromLocalStorage();
 
 function StartPage({ setAudio }) {
 	const [favchannels, setFavChannels] = useState([]);
+	const [favprograms, setFavPrograms] = useState([]);
+	const [schedule, setSchedule] = useState([]);
+
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		getFavoriteChannels();
-	}, [favchannels]);
+	}, []);
 
-	function getFavoriteChannels() {
-		fetchChannels().then((data) => {
+	function fetchFavoriteChannels() {
+		return fetchChannels().then((data) => {
 			// Filter out only the channels with IDs present in favoriteChan
 			const favoriteChannels = data.channels.filter((channel) =>
 				favoriteChan.includes(channel.id)
 			);
 			saveFavChan();
 			setFavChannels(favoriteChannels);
+			return favoriteChannels;
+		});
+	}
+
+	function fetchScheduleEpisodesForChannels(channels) {
+		const currentDate = new Date();
+		const formattedDate =
+			currentDate.getFullYear() +
+			"-" +
+			("0" + (currentDate.getMonth() + 1)).slice(-2) +
+			"-" +
+			("0" + currentDate.getDate()).slice(-2);
+
+		const scheduleProg = channels.map((chan) => {
+			const url = `http://api.sr.se/api/v2/scheduledepisodes?channelid=${chan}&date=${formattedDate}&format=json`;
+
+			return fetch(url).then((response) => response.json());
+		});
+
+		return Promise.all(scheduleProg);
+	}
+
+	function getFavoriteChannels() {
+		fetchFavoriteChannels().then((favoriteChannels) => {
+			// Extract the IDs from the favoriteChannels array
+			const channelIds = favoriteChannels.map((channel) => channel.id);
+
+			fetchScheduleEpisodesForChannels(channelIds)
+				.then((results) => {
+					// Process the results
+					const channelData = results.map((data, index) => {
+						return { channelId: channelIds[index], data: data };
+					});
+
+					// Set the schedule state to the resolved data
+					setSchedule(channelData);
+
+					// Use channelData array containing data for each channel
+					console.log(channelData);
+				})
+				.catch((error) => {
+					console.error("Error fetching data:", error);
+				});
 		});
 	}
 
@@ -164,8 +213,45 @@ function StartPage({ setAudio }) {
 					</>
 				)}
 				<h1>Favorit program</h1>
-
-				<h1>Schema</h1>
+				{schedule && schedule.length > 0 && (
+					<>
+						<h1>
+							Radio tablå <span>(för favoriserade kanaler)</span>
+						</h1>
+						<div id="tabla">
+							<div className="tabla-container">
+								{schedule.map((chan, index) => (
+									<div
+										key={index} // Adding a key to the outer div is necessary when using map
+										id={chan.channelId}
+										className="tabla-item"
+									>
+										<div className="rowheader">
+											{chan.data.schedule[0].channel.name}
+										</div>
+										{chan.data.schedule.map((prog, listindex) => (
+											<div className="tabla-program" key={listindex}>
+												<div className="image">
+													<img src={prog.imageurl} alt="" />
+												</div>
+												<div className="title">{prog.title}</div>
+												<div className="description">
+													{prog.description}
+												</div>
+												<div className="time">
+													<span>
+														Från: {formatTime(prog.starttimeutc)}
+													</span>
+													<span>Till: {formatTime(prog.endtimeutc)}</span>
+												</div>
+											</div>
+										))}
+									</div>
+								))}
+							</div>
+						</div>
+					</>
+				)}
 			</div>
 		</div>
 	);
