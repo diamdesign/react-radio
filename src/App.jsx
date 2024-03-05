@@ -15,7 +15,7 @@ function Header() {
 			<Link to="/" className="logo">
 				SR
 			</Link>
-			<Link to="/">Kanaler</Link>
+			<Link to="/kanaler">Kanaler</Link>
 			<Link to="/program">Program</Link>
 			<input
 				type="text"
@@ -33,9 +33,9 @@ function Header() {
 async function fetchChannels(id = "") {
 	let url;
 	if (id === null || id === "") {
-		url = "https://api.sr.se/api/v2/channels?format=json";
+		url = "https://api.sr.se/api/v2/channels?size=500&format=json";
 	} else {
-		url = "https://api.sr.se/api/v2/channels/" + id + "?format=json";
+		url = "https://api.sr.se/api/v2/channels/" + parseInt(id) + "?format=json";
 	}
 	try {
 		const response = await fetch(url);
@@ -49,8 +49,40 @@ async function fetchChannels(id = "") {
 
 let blurElement = document.querySelector("#colorblur");
 
-function ChannelPage({ setAudio, channels }) {
+var favoriteChan = [];
+function getFavoriteChanFromLocalStorage() {
+	const favoriteChanString = localStorage.getItem("favoriteChan");
+	if (favoriteChanString) {
+		return JSON.parse(favoriteChanString);
+	} else {
+		return [];
+	}
+}
+
+function saveFavChan() {
+	localStorage.setItem("favoriteChan", JSON.stringify(favoriteChan));
+}
+
+favoriteChan = getFavoriteChanFromLocalStorage();
+
+function StartPage({ setAudio }) {
+	const [favchannels, setFavChannels] = useState([]);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		getFavoriteChannels();
+	}, [favchannels]);
+
+	function getFavoriteChannels() {
+		fetchChannels().then((data) => {
+			// Filter out only the channels with IDs present in favoriteChan
+			const favoriteChannels = data.channels.filter((channel) =>
+				favoriteChan.includes(channel.id)
+			);
+			saveFavChan();
+			setFavChannels(favoriteChannels);
+		});
+	}
 
 	function handleChanPlay(e, id) {
 		e.stopPropagation();
@@ -63,7 +95,6 @@ function ChannelPage({ setAudio, channels }) {
 		});
 
 		fetchChannels(id).then((data) => {
-			console.log(data.channel);
 			if (isPaused) {
 				target.classList.remove("pause");
 				blurElement.style.background = "gray";
@@ -80,27 +111,162 @@ function ChannelPage({ setAudio, channels }) {
 	}
 
 	function handleChanClick(e, id) {
-		navigate("/channel/" + id);
+		navigate("/kanal/" + id);
+	}
+
+	function addChannel(e, id) {
+		e.stopPropagation();
+		let channel = document.querySelector(`.channel[data-id="${id}"]`);
+
+		// Check if the channel is favorited
+		if (channel.classList.contains("favorited")) {
+			// If the channel is favorited, remove the ID from favoriteChan
+			favoriteChan = favoriteChan.filter((chanId) => chanId !== id);
+		} else {
+			// If the channel is not favorited, add the ID to favoriteChan
+			favoriteChan.push(id);
+		}
+
+		saveFavChan(favoriteChan);
+
+		// Update the favorite channels based on the modified favoriteChan array
+		getFavoriteChannels();
 	}
 
 	return (
 		<div id="channels">
-			<h1>Kanaler</h1>
-			{channels.map((chan, index) => (
-				<div
-					className="channel"
-					key={index}
-					style={{ background: `#${chan.color}` }}
-					data-id={chan.id}
-					onClick={(e) => handleChanClick(e, chan.id)}
-				>
-					<div className="image">
-						<img src={chan.image} alt="" />
+			<div className="chancontainer">
+				{favoriteChan && favoriteChan.length > 0 && (
+					<>
+						<h1>Favorit kanaler</h1>
+						{favchannels.map((chan, index) => (
+							<div
+								className="channel favorited"
+								key={index}
+								style={{ background: `#${chan.color}` }}
+								data-id={chan.id}
+								onClick={(e) => handleChanClick(e, chan.id)}
+							>
+								<div className="image">
+									<img src={chan.image} alt="" />
+								</div>
+								<span>{chan.channeltype}</span>
+								<div
+									className="btn-favchan"
+									onClick={(e) => addChannel(e, chan.id)}
+								></div>
+								<div
+									className="chanplaybtn"
+									onClick={(e) => handleChanPlay(e, chan.id)}
+								></div>
+							</div>
+						))}
+					</>
+				)}
+				<h1>Favorit program</h1>
+
+				<h1>Schema</h1>
+			</div>
+		</div>
+	);
+}
+
+function ChannelPage({ setAudio }) {
+	const [channels, setChannels] = useState([]);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		fetchChannels().then((data) => {
+			setChannels(data.channels); // Set channels state
+		});
+	}, []);
+
+	useEffect(() => {
+		// Only run this effect when channels state has been updated
+		if (channels.length > 0) {
+			const channelElements = document.querySelectorAll(".channel");
+
+			channelElements.forEach((element) => {
+				const id = parseInt(element.getAttribute("data-id").trim(), 10); // Convert id to number
+				if (favoriteChan.includes(id)) {
+					element.classList.add("favorited");
+				} else {
+					element.classList.remove("favorited");
+				}
+			});
+		}
+	}, [channels, favoriteChan]);
+
+	function handleChanPlay(e, id) {
+		e.stopPropagation();
+
+		const target = e.target;
+		const isPaused = target.classList.contains("pause");
+
+		document.querySelectorAll(".chanplaybtn").forEach((btn) => {
+			btn.classList.remove("pause");
+		});
+
+		fetchChannels(id).then((data) => {
+			if (isPaused) {
+				target.classList.remove("pause");
+				blurElement.style.background = "gray";
+				setAudio(null);
+			} else {
+				target.classList.add("pause");
+				blurElement = document.querySelector("#colorblur");
+				blurElement.style.background = "#" + data.channel.color;
+				setAudio(data.channel); // Set channels state
+			}
+		});
+
+		console.log("Play audio for channel ID:", id);
+	}
+
+	function handleChanClick(e, id) {
+		navigate("/kanal/" + id);
+	}
+
+	function addChannel(e, id) {
+		e.stopPropagation();
+		const index = favoriteChan.indexOf(id); // Check if id is already in favoriteChan
+		if (index !== -1) {
+			favoriteChan.splice(index, 1); // If found, remove id from favoriteChan
+		} else {
+			favoriteChan.push(id); // If not found, add id to favoriteChan
+		}
+		saveFavChan(favoriteChan); // Save the updated favoriteChan to localStorage
+		// Toggle the "favorited" class for the corresponding element in the UI
+		const element = e.target.closest(".channel");
+		if (element) {
+			element.classList.toggle("favorited");
+		}
+	}
+
+	return (
+		<div id="channels">
+			<div className="chancontainer">
+				<h1>Kanaler</h1>
+				{channels.map((chan, index) => (
+					<div
+						className="channel"
+						key={index}
+						style={{ background: `#${chan.color}` }}
+						data-id={chan.id}
+						onClick={(e) => handleChanClick(e, chan.id)}
+					>
+						<div className="image">
+							<img src={chan.image} alt="" />
+						</div>
+						<span>{chan.channeltype}</span>
+						<div className="btn-favchan" onClick={(e) => addChannel(e, chan.id)}></div>
+						<div
+							className="chanplaybtn"
+							onClick={(e) => handleChanPlay(e, chan.id)}
+						></div>
 					</div>
-					<span>{chan.channeltype}</span>
-					<div className="chanplaybtn" onClick={(e) => handleChanPlay(e, chan.id)}></div>
-				</div>
-			))}
+				))}
+			</div>
 		</div>
 	);
 }
@@ -132,7 +298,6 @@ function ChannelDetails({ setAudio, channels }) {
 		const isPaused = target.classList.contains("pause");
 
 		fetchChannels(id).then((data) => {
-			console.log(data.channel);
 			if (isPaused) {
 				target.classList.remove("pause");
 				setAudio(null);
@@ -280,7 +445,8 @@ function Player({ audio }) {
 		<div id="player">
 			{audio !== null && audio !== "" && (
 				<>
-					<div className="playerthumb">
+					{console.log(audio)}
+					<div className="playerthumb" data-id={audio.id}>
 						<img src={audio.image} alt="" />
 					</div>
 					<audio ref={audioRef} autoPlay controls>
@@ -293,26 +459,17 @@ function Player({ audio }) {
 }
 
 function App() {
-	const [channels, setChannels] = useState([]);
 	const [audio, setAudio] = useState(null); // Define 'audio' state
-
-	useEffect(() => {
-		fetchChannels().then((data) => {
-			setChannels(data.channels); // Set channels state
-		});
-	}, []);
 
 	return (
 		<>
 			<Header />
 			<Routes>
+				<Route path="/" element={<StartPage setAudio={setAudio} />}></Route>
+				<Route path="/kanaler" element={<ChannelPage setAudio={setAudio} />}></Route>
 				<Route
-					path="/"
-					element={<ChannelPage channels={channels} setAudio={setAudio} />}
-				></Route>
-				<Route
-					path="/channel/:channelId"
-					element={<ChannelDetails channels={channels} setAudio={setAudio} />}
+					path="/kanal/:channelId"
+					element={<ChannelDetails setAudio={setAudio} />}
 				></Route>
 			</Routes>
 			<Player audio={audio} setAudio={setAudio} />

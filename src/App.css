@@ -6,15 +6,52 @@ body {
 }
 
 #channels {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: left;
+	gap: 1rem;
+	max-height: 93vh;
+	padding-bottom: 7rem;
+	overflow-y: auto;
+}
+
+.chancontainer {
+	width: 100%;
 	padding: 2rem;
 	display: flex;
 	flex-wrap: wrap;
-
-	justify-content: left;
-
 	gap: 1rem;
 }
 
+.btn-favchan {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.3rem;
+	width: 2rem;
+	height: 2rem;
+	background-image: url("../img/icon-fav.svg");
+	background-repeat: no-repeat;
+	background-size: 1.2rem;
+	background-position: center center;
+	filter: invert(1);
+	opacity: 0.4;
+	display: none;
+}
+
+.channel:hover .btn-favchan {
+	display: block;
+	opacity: 0.4;
+}
+
+.btn-favchan:hover {
+	cursor: pointer;
+	opacity: 1 !important;
+}
+
+.favorited .btn-favchan {
+	opacity: 1;
+	display: block;
+}
 .channel {
 	position: relative;
 	padding-bottom: 1rem;
@@ -43,7 +80,9 @@ body {
 }
 
 .image {
+	aspect-ratio: 1/1;
 	width: 200px;
+	margin: 1rem;
 }
 
 .image img {
@@ -195,6 +234,11 @@ h1 {
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	margin-bottom: 1rem;
 	padding-bottom: 1rem;
+	margin-top: 3rem;
+}
+
+h1:first-child {
+	margin-top: 0;
 }
 
 #colorblur {
@@ -302,10 +346,15 @@ audio::-webkit-media-controls-fullscreen-button {
 }
 
 #top {
+	padding: 2rem;
 	display: flex;
 	width: 100%;
 	padding-bottom: 1rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	position: sticky;
+	top: 0;
+	backdrop-filter: blur(1rem);
+	z-index: 10;
 }
 
 #top h1 {
@@ -318,6 +367,7 @@ audio::-webkit-media-controls-fullscreen-button {
 	min-width: 16rem;
 	width: 16rem;
 	margin-right: 2rem;
+	max-height: 16rem;
 }
 
 .channel-image img {
@@ -391,15 +441,10 @@ audio::-webkit-media-controls-fullscreen-button {
 
 #schedule {
 	position: relative;
-	overflow-y: scroll;
-	scrollbar-width: thin;
-	scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 	width: 100%;
 	min-width: 100%;
-	min-height: calc(100vh - 27rem);
-	height: calc(100vh - 27rem);
-	max-height: calc(100vh - 27rem);
-	padding-bottom: 4rem;
+	min-height: calc(100% - 18rem);
+	padding: 2rem;
 }
 
 .schedule-image {
