@@ -597,3 +597,48 @@ audio::-webkit-media-controls-fullscreen-button {
 	display: inline-block;
 	opacity: 0.7;
 }
+
+@media screen and (max-width: 1200px) {
+	#header input {
+		right: 1rem;
+		left: auto;
+		transform: translateX(0);
+		width: 20rem;
+	}
+}
+
+@media screen and (max-width: 680px) {
+	#header input {
+		right: 1rem;
+		left: auto;
+		transform: translateX(0);
+		width: 10rem;
+	}
+	#header a:not(.logo) {
+		padding: 1.4rem 0.5rem;
+	}
+
+	#channels .channel .image {
+		width: 100px;
+	}
+	h1 {
+		font-size: 2rem;
+	}
+	.channel-image {
+		min-width: 10rem;
+		width: 10rem;
+		max-height: 10rem;
+	}
+
+	.schedule-image {
+		width: 5rem;
+		min-width: 5rem;
+	}
+
+	.schedule-item {
+		margin-bottom: 1rem;
+	}
+	.rowheader {
+		font-size: 0.9rem;
+	}
+}
