@@ -554,6 +554,75 @@ function ChannelDetails({ setAudio }) {
 	);
 }
 
+function ProgramPage() {
+	const [programs, setPrograms] = useState([]);
+	const [listAmount, setListAmount] = useState(50);
+
+	async function getPrograms() {
+		const response = await fetch("https://api.sr.se/api/v2/programs?format=json&size=10000");
+		const data = await response.json();
+
+		return data;
+	}
+
+	let allPrograms = [];
+
+	const handleScroll = () => {
+		const channelsElement = document.querySelector("#channels");
+		if (
+			Math.ceil(channelsElement.clientHeight + channelsElement.scrollTop + 10) >
+			channelsElement.scrollHeight
+		) {
+			loadMorePrograms();
+		}
+	};
+
+	useEffect(() => {
+		getPrograms().then((data) => {
+			allPrograms = data.programs.slice(0, listAmount);
+			console.log(allPrograms);
+			setPrograms(allPrograms);
+		});
+	}, [listAmount]);
+
+	function loadMorePrograms() {
+		const channelsElement = document.querySelector("#channels");
+		const newAmount = listAmount + 50;
+		setListAmount(newAmount);
+		channelsElement.removeEventListener("scroll", handleScroll);
+	}
+
+	useEffect(() => {
+		const channelsElement = document.querySelector("#channels");
+
+		channelsElement.addEventListener("scroll", handleScroll);
+	}, [programs]);
+
+	return (
+		<>
+			<div id="channels">
+				<div className="chancontainer">
+					<h1>Program</h1>
+					{programs.map((prog, index) => (
+						<div
+							className="program-item"
+							key={index}
+							data-progid={prog.id}
+							data-id={prog.channel.id}
+						>
+							<div className="image">
+								<img src={prog.programimage} alt="" />
+							</div>
+							<div className="title">{prog.name}</div>
+							<div className="desc">{prog.description}</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</>
+	);
+}
+
 function Player({ audio }) {
 	const navigate = useNavigate();
 	const audioRef = useRef(null);
@@ -606,6 +675,7 @@ function App() {
 					path="/kanal/:channelId"
 					element={<ChannelDetails setAudio={setAudio} />}
 				></Route>
+				<Route path="/program" element={<ProgramPage />}></Route>
 			</Routes>
 			<Player audio={audio} setAudio={setAudio} />
 			<div id="colorblur"></div>
