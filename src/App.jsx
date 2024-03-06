@@ -68,6 +68,22 @@ function saveFavChan() {
 
 favoriteChan = getFromLocalStorage();
 
+function setPlayIndication() {
+	const playerIdElement = document.querySelector(".playerthumb");
+	const allElements = document.querySelectorAll(".channel");
+
+	if (playerIdElement && playBtnElement) {
+		const playerId = playerIdElement.getAttribute("data-id");
+
+		allElements.forEach((item) => {
+			let id = item.getAttribute("data-id");
+			if (id === playerId) {
+				item.querySelector(".chanplaybtn").classList.add("pause");
+			}
+		});
+	}
+}
+
 function StartPage({ setAudio }) {
 	const [favchannels, setFavChannels] = useState([]);
 	const [favprograms, setFavPrograms] = useState([]);
@@ -101,7 +117,7 @@ function StartPage({ setAudio }) {
 			("0" + currentDate.getDate()).slice(-2);
 
 		const scheduleProg = channels.map((chan) => {
-			const url = `http://api.sr.se/api/v2/scheduledepisodes?channelid=${chan}&date=${formattedDate}&format=json`;
+			const url = `https://api.sr.se/api/v2/scheduledepisodes?channelid=${chan}&date=${formattedDate}&format=json`;
 
 			return fetch(url).then((response) => response.json());
 		});
@@ -121,11 +137,10 @@ function StartPage({ setAudio }) {
 						return { channelId: channelIds[index], data: data };
 					});
 
+					setPlayIndication();
+
 					// Set the schedule state to the resolved data
 					setSchedule(channelData);
-
-					// Use channelData array containing data for each channel
-					console.log(channelData);
 				})
 				.catch((error) => {
 					console.error("Error fetching data:", error);
@@ -282,6 +297,8 @@ function ChannelPage({ setAudio }) {
 					element.classList.remove("favorited");
 				}
 			});
+
+			setPlayIndication();
 		}
 	}, [channels, favoriteChan]);
 
@@ -350,6 +367,7 @@ function ChannelPage({ setAudio }) {
 						<div className="btn-favchan" onClick={(e) => addChannel(e, chan.id)}></div>
 						<div
 							className="chanplaybtn"
+							data-id={chan.id}
 							onClick={(e) => handleChanPlay(e, chan.id)}
 						></div>
 					</div>
@@ -449,6 +467,18 @@ function ChannelDetails({ setAudio, channels }) {
 				setSchedule(filteredSchedule);
 				setIsLoading(false);
 
+				const playerIdElement = document.querySelector(".playerthumb");
+				const playBtnElement = document.querySelector(".chanplaybtn");
+
+				if (playerIdElement && playBtnElement) {
+					const playerId = playerIdElement.getAttribute("data-id");
+					const playBtnId = playBtnElement.getAttribute("data-id");
+
+					if (playBtnId === playerId) {
+						document.querySelector(".chanplaybtn").classList.add("pause");
+					}
+				}
+
 				return data;
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -477,6 +507,7 @@ function ChannelDetails({ setAudio, channels }) {
 						<div className="buttons">
 							<div
 								className="chanplaybtn"
+								data-id={channelData.channel.id}
 								onClick={(e) => handleChanPlay(e, channelData.channel.id)}
 							></div>
 							<a
@@ -519,6 +550,7 @@ function ChannelDetails({ setAudio, channels }) {
 }
 
 function Player({ audio }) {
+	const navigate = useNavigate();
 	const audioRef = useRef(null);
 
 	useEffect(() => {
@@ -528,13 +560,23 @@ function Player({ audio }) {
 		}
 	}, [audio]);
 
+	function handleChanClick(e, id) {
+		navigate("/kanal/" + id);
+	}
+
 	// Placeholder for the Player component
 	return (
 		<div id="player">
 			{audio !== null && audio !== "" && (
 				<>
 					{console.log(audio)}
-					<div className="playerthumb" data-id={audio.id}>
+					<div
+						className="playerthumb"
+						data-id={audio.id}
+						onClick={(e) => {
+							handleChanClick(e, audio.id);
+						}}
+					>
 						<img src={audio.image} alt="" />
 					</div>
 					<audio ref={audioRef} autoPlay controls>
