@@ -72,7 +72,7 @@ function setPlayIndication() {
 	const playerIdElement = document.querySelector(".playerthumb");
 	const allElements = document.querySelectorAll(".channel");
 
-	if (playerIdElement && playBtnElement) {
+	if (playerIdElement) {
 		const playerId = playerIdElement.getAttribute("data-id");
 
 		allElements.forEach((item) => {
@@ -569,7 +569,6 @@ function Player({ audio }) {
 		<div id="player">
 			{audio !== null && audio !== "" && (
 				<>
-					{console.log(audio)}
 					<div
 						className="playerthumb"
 						data-id={audio.id}
