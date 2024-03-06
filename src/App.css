@@ -435,6 +435,8 @@ audio::-webkit-media-controls-fullscreen-button {
 	margin-top: 0.5rem;
 }
 .channel-info p {
+	font-family: "Archivo", sans-serif;
+	line-height: 1.6rem;
 	margin-top: 1rem;
 }
 
@@ -511,6 +513,8 @@ audio::-webkit-media-controls-fullscreen-button {
 	font-size: 0.9rem;
 	margin-top: 0.5rem;
 	color: rgba(255, 255, 255, 0.5);
+	font-family: "Archivo", sans-serif;
+	line-height: 1.2rem;
 }
 
 .schedule-item span {
@@ -623,10 +627,18 @@ audio::-webkit-media-controls-fullscreen-button {
 	font-size: 0.8rem;
 	opacity: 0.5;
 	max-width: 13rem;
+	font-family: "Archivo", sans-serif;
+	line-height: 1.2rem;
+	margin-top: 0.3rem;
 }
 
 .tabla-item .title {
+	font-weight: 600;
 	max-width: 13rem;
+}
+
+.tabla-program:hover .title {
+	text-decoration: underline;
 }
 
 .tabla-item span {
@@ -695,6 +707,8 @@ audio::-webkit-media-controls-fullscreen-button {
 	width: 100%;
 	box-shadow: 0 7px 2px rgba(0, 0, 0, 0.5);
 	font-size: 0.8rem;
+	font-family: "Archivo", sans-serif;
+	line-height: 1rem;
 }
 
 .channel:hover {
@@ -747,6 +761,9 @@ audio::-webkit-media-controls-fullscreen-button {
 .program-item .proginfo .desc {
 	opacity: 0.5;
 	font-size: 0.9rem;
+	font-family: "Archivo", sans-serif;
+	line-height: 1.2rem;
+	margin-top: 0.3rem;
 }
 
 .icon-pod {
