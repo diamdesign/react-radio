@@ -2,6 +2,74 @@ import { useState, useEffect, useRef, createElement } from "react";
 import { Routes, Route, useNavigate, Link, useParams } from "react-router-dom";
 import "./App.css";
 
+let blurElement = document.querySelector("#colorblur");
+
+var favoriteChan = [];
+var favoriteProg = [];
+
+async function fetchChannels(id = "") {
+	let url;
+	if (id === null || id === "") {
+		url = "https://api.sr.se/api/v2/channels?size=500&format=json";
+	} else {
+		url = "https://api.sr.se/api/v2/channels/" + parseInt(id) + "?format=json";
+	}
+	try {
+		const response = await fetch(url);
+		const data = await response.json();
+
+		return data;
+	} catch (error) {
+		console.error("Error fetching channels:", error);
+	}
+}
+
+function getFromLocalStorage() {
+	const favoriteChanString = localStorage.getItem("favoriteChan");
+	if (favoriteChanString) {
+		return JSON.parse(favoriteChanString);
+	} else {
+		return [];
+	}
+}
+
+function saveFavChan() {
+	localStorage.setItem("favoriteChan", JSON.stringify(favoriteChan));
+}
+
+favoriteChan = getFromLocalStorage();
+
+function formatTime(inputDate) {
+	// Extract the number of milliseconds from the date string
+	const milliseconds = parseInt(inputDate.match(/\d+/)[0]);
+
+	// Create a new Date object using the milliseconds
+	const date = new Date(milliseconds);
+
+	// Format the date as desired (e.g., using toLocaleString())
+	const formattedDate = date.toLocaleString();
+	return formattedDate;
+}
+
+function setPlayIndication() {
+	const playerIdElement = document.querySelector(".playerthumb");
+	const allElements = document.querySelectorAll(".channel");
+
+	if (playerIdElement) {
+		const playerId = playerIdElement.getAttribute("data-id");
+		const color = playerIdElement.getAttribute("data-bg");
+
+		blurElement.style.background = "#" + color;
+
+		allElements.forEach((item) => {
+			let id = item.getAttribute("data-id");
+			if (id === playerId) {
+				item.querySelector(".chanplaybtn").classList.add("pause");
+			}
+		});
+	}
+}
+
 function Header() {
 	const [search, setSearch] = useState("");
 
@@ -28,60 +96,6 @@ function Header() {
 			/>
 		</div>
 	);
-}
-
-async function fetchChannels(id = "") {
-	let url;
-	if (id === null || id === "") {
-		url = "https://api.sr.se/api/v2/channels?size=500&format=json";
-	} else {
-		url = "https://api.sr.se/api/v2/channels/" + parseInt(id) + "?format=json";
-	}
-	try {
-		const response = await fetch(url);
-		const data = await response.json();
-
-		return data;
-	} catch (error) {
-		console.error("Error fetching channels:", error);
-	}
-}
-
-let blurElement = document.querySelector("#colorblur");
-
-var favoriteChan = [];
-var favoriteProg = [];
-var scheduleProg = [];
-
-function getFromLocalStorage() {
-	const favoriteChanString = localStorage.getItem("favoriteChan");
-	if (favoriteChanString) {
-		return JSON.parse(favoriteChanString);
-	} else {
-		return [];
-	}
-}
-
-function saveFavChan() {
-	localStorage.setItem("favoriteChan", JSON.stringify(favoriteChan));
-}
-
-favoriteChan = getFromLocalStorage();
-
-function setPlayIndication() {
-	const playerIdElement = document.querySelector(".playerthumb");
-	const allElements = document.querySelectorAll(".channel");
-
-	if (playerIdElement) {
-		const playerId = playerIdElement.getAttribute("data-id");
-
-		allElements.forEach((item) => {
-			let id = item.getAttribute("data-id");
-			if (id === playerId) {
-				item.querySelector(".chanplaybtn").classList.add("pause");
-			}
-		});
-	}
 }
 
 function StartPage({ setAudio }) {
@@ -370,6 +384,9 @@ function ChannelPage({ setAudio }) {
 							data-id={chan.id}
 							onClick={(e) => handleChanPlay(e, chan.id)}
 						></div>
+						<div className="desc" style={{ background: `#${chan.color}` }}>
+							{chan.tagline}
+						</div>
 					</div>
 				))}
 			</div>
@@ -377,19 +394,7 @@ function ChannelPage({ setAudio }) {
 	);
 }
 
-function formatTime(inputDate) {
-	// Extract the number of milliseconds from the date string
-	const milliseconds = parseInt(inputDate.match(/\d+/)[0]);
-
-	// Create a new Date object using the milliseconds
-	const date = new Date(milliseconds);
-
-	// Format the date as desired (e.g., using toLocaleString())
-	const formattedDate = date.toLocaleString();
-	return formattedDate;
-}
-
-function ChannelDetails({ setAudio, channels }) {
+function ChannelDetails({ setAudio }) {
 	let { channelId } = useParams();
 
 	const [page, setPage] = useState(1);
@@ -572,6 +577,7 @@ function Player({ audio }) {
 					<div
 						className="playerthumb"
 						data-id={audio.id}
+						data-bg={audio.color}
 						onClick={(e) => {
 							handleChanClick(e, audio.id);
 						}}
