@@ -218,6 +218,10 @@ body {
 	filter: invert(1);
 }
 
+.playerthumb:hover {
+	cursor: pointer;
+}
+
 .playerthumb img {
 	width: 100%;
 	height: 100%;
