@@ -23,7 +23,8 @@ body {
 	gap: 1rem;
 }
 
-.btn-favchan {
+.btn-favchan,
+.btn-favprog {
 	position: absolute;
 	top: 0.5rem;
 	right: 0.3rem;
@@ -31,24 +32,28 @@ body {
 	height: 2rem;
 	background-image: url("../img/icon-fav.svg");
 	background-repeat: no-repeat;
-	background-size: 1.2rem;
+	background-size: 1rem;
 	background-position: center center;
 	filter: invert(1);
 	opacity: 0.4;
 	display: none;
+	z-index: 10;
 }
 
-.channel:hover .btn-favchan {
+.channel:hover .btn-favchan,
+.program-item:hover .btn-favprog {
 	display: block;
 	opacity: 0.4;
 }
 
-.btn-favchan:hover {
+.btn-favchan:hover,
+.btn-favprog:hover {
 	cursor: pointer;
 	opacity: 1 !important;
 }
 
-.favorited .btn-favchan {
+.favorited .btn-favchan,
+.favorited .btn-favprog {
 	opacity: 1;
 	display: block;
 }
@@ -455,34 +460,45 @@ audio::-webkit-media-controls-fullscreen-button {
 	min-width: 100%;
 	min-height: calc(100% - 18rem);
 	padding: 2rem;
+	display: flex;
+	flex-flow: wrap;
+	flex-direction: column;
+	gap: 1rem;
 }
 
 .schedule-image {
-	width: 10rem;
-	min-width: 10rem;
+	width: 11rem;
+	min-width: 11rem;
+	margin-right: 2rem;
 }
 
 .schedule-image img {
+	height: 100%;
+	object-fit: cover;
 	width: 100%;
-	aspect-ratio: 1/1;
+	aspect-ratio: 1;
 	background-color: rgba(255, 255, 255, 0.1);
 	border: none;
 }
 
 .schedule-item {
 	display: flex;
-	gap: 2rem;
-	opacity: 0.4;
-	filter: grayscale(1);
 	transition: opacity 0.4s ease-in-out, grayscale 0.4s ease-in-out;
+	background: rgba(255, 255, 255, 0.1);
 }
 
 .schedule-item:hover {
-	filter: grayscale(0);
 	opacity: 1;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.schedule-item:hover .schedule-image {
+	animation: flash 0.4s ease-in-out 1 forwards;
 }
 
 .schedule-item h2 {
+	padding-top: 1rem;
 	font-family: "Archivo", sans-serif;
 	color: white;
 	font-weight: 500;
@@ -563,7 +579,7 @@ audio::-webkit-media-controls-fullscreen-button {
 }
 
 .rowheader {
-	background: rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.1);
 	border-radius: 0.3rem;
 	font-weight: 700;
 	font-size: 1.4rem;
@@ -577,27 +593,49 @@ audio::-webkit-media-controls-fullscreen-button {
 }
 
 .tabla-program {
-	padding: 1rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 	padding-bottom: 1rem;
 	margin-bottom: 1rem;
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.tabla-program:hover {
+	background: rgba(255, 255, 255, 0.2);
+	cursor: pointer;
+}
+
+.tabla-program:hover .image {
+	animation: flash 0.4s ease-in-out 1 forwards;
+}
+
+.tabla-info {
+	padding: 0 1rem 0.5rem 1rem;
+}
+.tabla-item {
+	gap: 0.5rem;
 }
 .tabla-item .image {
 	margin: 0;
-	width: 10rem;
+	width: 15rem;
 }
 
 .tabla-item .description {
 	font-size: 0.8rem;
 	opacity: 0.5;
+	max-width: 13rem;
+}
+
+.tabla-item .title {
+	max-width: 13rem;
 }
 
 .tabla-item span {
-	background: rgb(72, 72, 72);
+	background: rgba(65, 105, 225, 0.5);
 	padding: 0.2rem 0.5rem;
 	border-radius: 0.3rem;
-	font-size: 0.65rem;
+	font-size: 0.8rem;
 	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 	display: inline-block;
 	opacity: 0.7;
 }
@@ -665,4 +703,63 @@ audio::-webkit-media-controls-fullscreen-button {
 .channel:hover .desc {
 	display: block;
 	z-index: 2000;
+}
+
+.program-item {
+	display: flex;
+	width: 37rem;
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(0.5rem);
+	color: white;
+}
+
+.program-item:hover {
+	background: rgba(255, 255, 255, 0.2);
+	cursor: pointer;
+}
+
+.program-item:hover .title {
+	text-decoration: underline;
+}
+
+.program-item:hover .image {
+	animation: flash 0.33s ease-out 1 forwards;
+}
+
+.program-item .image {
+	aspect-ratio: auto;
+	padding: 0;
+	margin: 0;
+	width: 10rem;
+	min-width: 10rem;
+	margin-bottom: 0;
+}
+
+.program-item .proginfo {
+	padding: 1rem;
+	position: relative;
+}
+
+.program-item .proginfo .title {
+	font-weight: 600;
+}
+
+.program-item .proginfo .desc {
+	opacity: 0.5;
+	font-size: 0.9rem;
+}
+
+.icon-pod {
+	width: 2rem;
+	height: 2rem;
+	background-image: url("../img/icon-pod.svg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 1.6rem;
+	filter: invert(1);
+	opacity: 0.5;
+	position: absolute;
+	bottom: 0.5rem;
+	left: 0.8rem;
+	content: "";
 }

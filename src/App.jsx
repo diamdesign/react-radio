@@ -51,6 +51,16 @@ function formatTime(inputDate) {
 	return formattedDate;
 }
 
+function onlyTime(timeString) {
+	// Extract the time part from the datetime string
+	const timePart = timeString.split(" ")[1];
+
+	// Remove the last three characters (seconds part)
+	const formattedTime = timePart.slice(0, -3);
+
+	return formattedTime;
+}
+
 function setPlayIndication() {
 	const playerIdElement = document.querySelector(".playerthumb");
 	const allElements = document.querySelectorAll(".channel");
@@ -261,19 +271,30 @@ function StartPage({ setAudio }) {
 											{chan.data.schedule[0].channel.name}
 										</div>
 										{chan.data.schedule.map((prog, listindex) => (
-											<div className="tabla-program" key={listindex}>
+											<div
+												className="tabla-program"
+												key={listindex}
+												data-progid={prog.program.id}
+											>
 												<div className="image">
 													<img src={prog.imageurl} alt="" />
 												</div>
-												<div className="title">{prog.title}</div>
-												<div className="description">
-													{prog.description}
-												</div>
-												<div className="time">
-													<span>
-														Från: {formatTime(prog.starttimeutc)}
-													</span>
-													<span>Till: {formatTime(prog.endtimeutc)}</span>
+
+												<div className="tabla-info">
+													<div className="time">
+														<span>
+															Sänds:{" "}
+															{onlyTime(
+																formatTime(prog.starttimeutc)
+															)}{" "}
+															-{" "}
+															{onlyTime(formatTime(prog.endtimeutc))}
+														</span>
+													</div>
+													<div className="title">{prog.title}</div>
+													<div className="description">
+														{prog.description}
+													</div>
 												</div>
 											</div>
 										))}
@@ -535,7 +556,7 @@ function ChannelDetails({ setAudio }) {
 				)}
 				{!isLoading &&
 					scheduleData.map((item, index) => (
-						<div className="schedule-item" key={index}>
+						<div className="schedule-item" key={index} data-progid={item.program.id}>
 							<div className="schedule-image">
 								<img src={item.imageurl} />
 							</div>
@@ -543,8 +564,10 @@ function ChannelDetails({ setAudio }) {
 								<h2>{item.program.name}</h2>
 								<p>{item.description}</p>
 								<p>
-									<span>Från: {formatTime(item.starttimeutc)}</span>
-									<span>Till: {formatTime(item.endtimeutc)}</span>
+									<span>
+										Sänds: {onlyTime(formatTime(item.starttimeutc))} -{" "}
+										{onlyTime(formatTime(item.endtimeutc))}
+									</span>
 								</p>
 							</div>
 						</div>
@@ -610,11 +633,15 @@ function ProgramPage() {
 							data-progid={prog.id}
 							data-id={prog.channel.id}
 						>
+							<div className="btn-favprog"></div>
 							<div className="image">
 								<img src={prog.programimage} alt="" />
 							</div>
-							<div className="title">{prog.name}</div>
-							<div className="desc">{prog.description}</div>
+							<div className="proginfo">
+								<div className="title">{prog.name}</div>
+								<div className="desc">{prog.description}</div>
+								{prog.haspod && <div className="icon-pod"></div>}
+							</div>
 						</div>
 					))}
 				</div>
