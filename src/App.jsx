@@ -548,7 +548,9 @@ function ChannelDetails({ setAudio }) {
 	function handleAllProgramClick(id) {
 		async function getChannelPrograms(id) {
 			const response = await fetch(
-				"http://api.sr.se/api/v2/programs/index?channelid=" + id + "&format=json&size=10000"
+				"https://api.sr.se/api/v2/programs/index?channelid=" +
+					id +
+					"&format=json&size=10000"
 			);
 			const data = response.json();
 			return data;
@@ -789,7 +791,7 @@ function ProgramDetails({ setAudio }) {
 	async function getProgram(programId) {
 		try {
 			const response = await fetch(
-				`http://api.sr.se/api/v2/programs/${programId}?format=json&size=2000`
+				`https://api.sr.se/api/v2/programs/${programId}?format=json&size=2000`
 			);
 
 			if (!response.ok) {
