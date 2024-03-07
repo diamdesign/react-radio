@@ -162,11 +162,10 @@ function StartPage({ setAudio }) {
 						return { channelId: channelIds[index], data: data };
 					});
 
-					setPlayIndication();
-
 					// Set the schedule state to the resolved data
 					setSchedule(channelData);
 					setIsLoading(false);
+					setPlayIndication();
 				})
 				.catch((error) => {
 					console.error("Error fetching data:", error);
@@ -200,10 +199,6 @@ function StartPage({ setAudio }) {
 		console.log("Play audio for channel ID:", id);
 	}
 
-	function handleChanClick(e, id) {
-		navigate("/kanal/" + id);
-	}
-
 	function addChannel(e, id) {
 		e.stopPropagation();
 		let channel = document.querySelector(`.channel[data-id="${id}"]`);
@@ -221,6 +216,14 @@ function StartPage({ setAudio }) {
 
 		// Update the favorite channels based on the modified favoriteChan array
 		getFavoriteChannels();
+	}
+
+	function handleChanClick(e, id) {
+		navigate("/kanal/" + id);
+	}
+
+	function handleProgClick(e, id) {
+		navigate("/program/" + id);
 	}
 
 	return (
@@ -283,6 +286,9 @@ function StartPage({ setAudio }) {
 													className="tabla-program"
 													key={listindex}
 													data-progid={prog.program.id}
+													onClick={(e) => {
+														handleProgClick(e, prog.program.id);
+													}}
 												>
 													<div className="image">
 														<img src={prog.imageurl} alt="" />
@@ -373,10 +379,6 @@ function ChannelPage({ setAudio }) {
 		console.log("Play audio for channel ID:", id);
 	}
 
-	function handleChanClick(e, id) {
-		navigate("/kanal/" + id);
-	}
-
 	function addChannel(e, id) {
 		e.stopPropagation();
 		const index = favoriteChan.indexOf(id); // Check if id is already in favoriteChan
@@ -391,6 +393,10 @@ function ChannelPage({ setAudio }) {
 		if (element) {
 			element.classList.toggle("favorited");
 		}
+	}
+
+	function handleChanClick(e, id) {
+		navigate("/kanal/" + id);
 	}
 
 	return (
@@ -433,7 +439,7 @@ function ChannelDetails({ setAudio }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [channelData, setChannelData] = useState(null);
 	const [scheduleData, setSchedule] = useState(null);
-	const [showPrograms, setShowPrograms] = useState([]);
+	const [showPrograms, setShowPrograms] = useState(null);
 
 	function handleChanPlay(e, id) {
 		e.stopPropagation();
@@ -539,6 +545,20 @@ function ChannelDetails({ setAudio }) {
 		});
 	}, [channelId]);
 
+	function handleAllProgramClick(id) {
+		async function getChannelPrograms(id) {
+			const response = await fetch(
+				"http://api.sr.se/api/v2/programs/index?channelid=" + id + "&format=json&size=10000"
+			);
+			const data = response.json();
+			return data;
+		}
+		getChannelPrograms(id).then((data) => {
+			setShowPrograms(data.programs);
+			console.log(data.programs);
+		});
+	}
+
 	function handleProgClick(e, id) {
 		navigate("/program/" + id);
 	}
@@ -566,10 +586,18 @@ function ChannelDetails({ setAudio }) {
 								onClick={(e) => handleChanPlay(e, channelData.channel.id)}
 							></div>
 							{showPrograms && showPrograms.length > 0 ? (
-								<div className="programs">Dagens schema</div>
+								<div className="programs" onClick={() => setShowPrograms(null)}>
+									Dagens schema
+								</div>
 							) : (
-								<div className="programs">Alla program</div>
+								<div
+									className="programs"
+									onClick={() => handleAllProgramClick(channelData.channel.id)}
+								>
+									Alla program
+								</div>
 							)}
+
 							<a
 								className="website"
 								href={channelData.channel.siteurl}
@@ -590,7 +618,34 @@ function ChannelDetails({ setAudio }) {
 								<div className="loader"></div>
 							</div>
 						)}
-						{!isLoading && <h2>Alla program</h2>}
+						{!isLoading && (
+							<>
+								<h2>Alla program</h2>
+								<div className="chancontainer">
+									{showPrograms.map((prog) => (
+										<div
+											className="program-item"
+											data-progid={prog.id}
+											data-id={prog.channel.id}
+											key={prog.id}
+											onClick={(e) => {
+												handleProgClick(e, prog.id);
+											}}
+										>
+											<div className="btn-favprog"></div>
+											<div className="image">
+												<img src={prog.programimage} alt="" />
+											</div>
+											<div className="proginfo">
+												<div className="title">{prog.name}</div>
+												<div className="desc">{prog.description}</div>
+												{prog.haspod && <div className="icon-pod"></div>}
+											</div>
+										</div>
+									))}
+								</div>
+							</>
+						)}
 					</>
 				) : (
 					// Content to render when showPrograms is not set
@@ -634,7 +689,6 @@ function ChannelDetails({ setAudio }) {
 }
 
 function ProgramPage() {
-	let { progId } = useParams();
 	const [isLoading, setIsLoading] = useState(true);
 	const [programs, setPrograms] = useState([]);
 	const [listAmount, setListAmount] = useState(50);
@@ -675,15 +729,15 @@ function ProgramPage() {
 		channelsElement.removeEventListener("scroll", handleScroll);
 	}
 
-	function handleProgClick(e, id) {
-		navigate("/program/" + id);
-	}
-
 	useEffect(() => {
 		const channelsElement = document.querySelector("#channels");
 
 		channelsElement.addEventListener("scroll", handleScroll);
 	}, [programs]);
+
+	function handleProgClick(e, id) {
+		navigate("/program/" + id);
+	}
 
 	return (
 		<>
@@ -725,18 +779,24 @@ function ProgramPage() {
 }
 
 function ProgramDetails({ setAudio }) {
+	let { programId } = useParams();
 	const [isLoading, setIsLoading] = useState(true);
 	const [programs, setProgram] = useState([]);
 
-	async function getProgram() {
-		const response = await fetch("https://api.sr.se/api/v2/programs?format=json&size=10000");
+	async function getProgram(programId) {
+		const response = await fetch(
+			"http://api.sr.se/api/v2/programs/" + programId + "?format=json&size=2000"
+		);
 		const data = await response.json();
 		setIsLoading(false);
 		return data;
 	}
 
 	useEffect(() => {
-		setPlayIndication();
+		getProgram(programId).then((data) => {
+			console.log(data);
+			setPlayIndication();
+		});
 	}, []);
 	return <></>;
 }
@@ -751,10 +811,6 @@ function Player({ audio }) {
 			audioRef.current.play(); // Play the audio
 		}
 	}, [audio]);
-
-	function handleChanClick(e, id) {
-		navigate("/kanal/" + id);
-	}
 
 	// Placeholder for the Player component
 	return (
