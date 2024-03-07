@@ -787,17 +787,33 @@ function ProgramDetails({ setAudio }) {
 	const navigate = useNavigate();
 
 	async function getProgram(programId) {
-		const response = await fetch(
-			"http://api.sr.se/api/v2/programs/" + programId + "?format=json&size=2000"
-		);
-		const data = await response.json();
-		setIsLoading(false);
-		return data.program;
+		try {
+			const response = await fetch(
+				`http://api.sr.se/api/v2/programs/${programId}?format=json&size=2000`
+			);
+
+			if (!response.ok) {
+				if (response.status === 404) {
+					console.log("Program not found");
+					// Handle the 404 response here, such as showing an error message or navigating back
+					navigate("/program/");
+
+					return;
+				} else {
+					throw new Error(`HTTP error! Status: ${response.status}`);
+				}
+			}
+
+			const data = await response.json();
+			setIsLoading(false);
+			return data.program;
+		} catch (error) {
+			console.error("Error fetching program:", error);
+		}
 	}
 
 	useEffect(() => {
 		getProgram(programId).then((data) => {
-			console.log(data);
 			setProgram(data);
 			setPlayIndication();
 			setIsLoading(false);
@@ -831,7 +847,7 @@ function ProgramDetails({ setAudio }) {
 									{program.channel.name}
 								</span>
 							)}
-							{program.programcategory.id !== null && (
+							{program.programcategory && (
 								<span
 									data-catid={program.programcategory.id}
 									onClick={() => handleCatClick(program.programcategory.id)}
@@ -878,6 +894,10 @@ function Player({ audio }) {
 			audioRef.current.play(); // Play the audio
 		}
 	}, [audio]);
+
+	function handleChanClick(e, id) {
+		navigate("/kanal/" + id);
+	}
 
 	// Placeholder for the Player component
 	return (
