@@ -109,6 +109,7 @@ function Header() {
 }
 
 function StartPage({ setAudio }) {
+	const [isLoading, setIsLoading] = useState(true);
 	const [favchannels, setFavChannels] = useState([]);
 	const [favprograms, setFavPrograms] = useState([]);
 	const [schedule, setSchedule] = useState([]);
@@ -165,6 +166,7 @@ function StartPage({ setAudio }) {
 
 					// Set the schedule state to the resolved data
 					setSchedule(channelData);
+					setIsLoading(false);
 				})
 				.catch((error) => {
 					console.error("Error fetching data:", error);
@@ -261,45 +263,53 @@ function StartPage({ setAudio }) {
 						</h1>
 						<div id="tabla">
 							<div className="tabla-container">
-								{schedule.map((chan, index) => (
-									<div
-										key={index} // Adding a key to the outer div is necessary when using map
-										id={chan.channelId}
-										className="tabla-item"
-									>
-										<div className="rowheader">
-											{chan.data.schedule[0].channel.name}
-										</div>
-										{chan.data.schedule.map((prog, listindex) => (
-											<div
-												className="tabla-program"
-												key={listindex}
-												data-progid={prog.program.id}
-											>
-												<div className="image">
-													<img src={prog.imageurl} alt="" />
-												</div>
-
-												<div className="tabla-info">
-													<div className="time">
-														<span>
-															Sänds:{" "}
-															{onlyTime(
-																formatTime(prog.starttimeutc)
-															)}{" "}
-															-{" "}
-															{onlyTime(formatTime(prog.endtimeutc))}
-														</span>
-													</div>
-													<div className="title">{prog.title}</div>
-													<div className="description">
-														{prog.description}
-													</div>
-												</div>
-											</div>
-										))}
+								{isLoading && (
+									<div id="scheduleloader">
+										<div className="loader"></div>
 									</div>
-								))}
+								)}
+								{!isLoading &&
+									schedule.map((chan, index) => (
+										<div
+											key={index} // Adding a key to the outer div is necessary when using map
+											id={chan.channelId}
+											className="tabla-item"
+										>
+											<div className="rowheader">
+												{chan.data.schedule[0].channel.name}
+											</div>
+											{chan.data.schedule.map((prog, listindex) => (
+												<div
+													className="tabla-program"
+													key={listindex}
+													data-progid={prog.program.id}
+												>
+													<div className="image">
+														<img src={prog.imageurl} alt="" />
+													</div>
+
+													<div className="tabla-info">
+														<div className="time">
+															<span>
+																Sänds:{" "}
+																{onlyTime(
+																	formatTime(prog.starttimeutc)
+																)}{" "}
+																-{" "}
+																{onlyTime(
+																	formatTime(prog.endtimeutc)
+																)}
+															</span>
+														</div>
+														<div className="title">{prog.title}</div>
+														<div className="description">
+															{prog.description}
+														</div>
+													</div>
+												</div>
+											))}
+										</div>
+									))}
 							</div>
 						</div>
 					</>
@@ -578,13 +588,15 @@ function ChannelDetails({ setAudio }) {
 }
 
 function ProgramPage() {
+	const [isLoading, setIsLoading] = useState(true);
 	const [programs, setPrograms] = useState([]);
 	const [listAmount, setListAmount] = useState(50);
+	const navigate = useNavigate();
 
 	async function getPrograms() {
 		const response = await fetch("https://api.sr.se/api/v2/programs?format=json&size=10000");
 		const data = await response.json();
-
+		setIsLoading(false);
 		return data;
 	}
 
@@ -615,6 +627,10 @@ function ProgramPage() {
 		channelsElement.removeEventListener("scroll", handleScroll);
 	}
 
+	function handleProgClick(e, id) {
+		navigate("/program/" + id);
+	}
+
 	useEffect(() => {
 		const channelsElement = document.querySelector("#channels");
 
@@ -626,28 +642,41 @@ function ProgramPage() {
 			<div id="channels">
 				<div className="chancontainer">
 					<h1>Program</h1>
-					{programs.map((prog, index) => (
-						<div
-							className="program-item"
-							key={index}
-							data-progid={prog.id}
-							data-id={prog.channel.id}
-						>
-							<div className="btn-favprog"></div>
-							<div className="image">
-								<img src={prog.programimage} alt="" />
-							</div>
-							<div className="proginfo">
-								<div className="title">{prog.name}</div>
-								<div className="desc">{prog.description}</div>
-								{prog.haspod && <div className="icon-pod"></div>}
-							</div>
+					{isLoading && (
+						<div id="scheduleloader">
+							<div className="loader"></div>
 						</div>
-					))}
+					)}
+					{!isLoading &&
+						programs.map((prog, index) => (
+							<div
+								className="program-item"
+								key={index}
+								data-progid={prog.id}
+								data-id={prog.channel.id}
+								onClick={(e) => {
+									handleProgClick(e, prog.id);
+								}}
+							>
+								<div className="btn-favprog"></div>
+								<div className="image">
+									<img src={prog.programimage} alt="" />
+								</div>
+								<div className="proginfo">
+									<div className="title">{prog.name}</div>
+									<div className="desc">{prog.description}</div>
+									{prog.haspod && <div className="icon-pod"></div>}
+								</div>
+							</div>
+						))}
 				</div>
 			</div>
 		</>
 	);
+}
+
+function ProgramDetails({ setAudio }) {
+	return <></>;
 }
 
 function Player({ audio }) {
@@ -703,6 +732,10 @@ function App() {
 					element={<ChannelDetails setAudio={setAudio} />}
 				></Route>
 				<Route path="/program" element={<ProgramPage />}></Route>
+				<Route
+					path="/program/:programId"
+					element={<ProgramDetails setAudio={setAudio} />}
+				></Route>
 			</Routes>
 			<Player audio={audio} setAudio={setAudio} />
 			<div id="colorblur"></div>

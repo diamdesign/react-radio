@@ -611,6 +611,11 @@ audio::-webkit-media-controls-fullscreen-button {
 .tabla-program:hover .image {
 	animation: flash 0.4s ease-in-out 1 forwards;
 }
+.tabla-container {
+	position: relative;
+	width: 100%;
+	min-height: 10rem;
+}
 
 .tabla-info {
 	padding: 0 1rem 0.5rem 1rem;
