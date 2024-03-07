@@ -13,6 +13,10 @@ body {
 	max-height: 93vh;
 	padding-bottom: 3rem;
 	overflow-y: auto;
+	min-height: 100px;
+	position: relative;
+	justify-content: center;
+	align-items: center;
 }
 
 .chancontainer {
@@ -41,6 +45,10 @@ body {
 	opacity: 0.4;
 	display: none;
 	z-index: 10;
+}
+
+#proginfo .btn-favchan {
+	margin-left: 0;
 }
 
 .channel:hover .btn-favchan,
@@ -461,12 +469,32 @@ audio::-webkit-media-controls-fullscreen-button {
 	max-height: 6.2rem;
 	overflow: hidden;
 }
-.channel-info span {
+.channel-info span,
+.channel-info .chanbutton {
+	color: white;
+	text-decoration: none;
 	background: gray;
 	padding: 0.2rem 0.5rem;
 	border-radius: 0.3rem;
 	font-size: 0.8rem;
 	margin-top: 0.5rem;
+	margin-right: 0.5rem;
+}
+
+.channel-info .buttons .icon-pod {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 3rem;
+	height: 3rem;
+	margin-top: 1rem;
+	margin-left: 0.5rem;
+}
+
+.channel-info .chanbutton:hover {
+	cursor: pointer;
+	background: white;
+	color: black;
 }
 .channel-info p {
 	font-family: "Archivo", sans-serif;
@@ -747,9 +775,9 @@ audio::-webkit-media-controls-fullscreen-button {
 	color: white;
 	width: 100%;
 	box-shadow: 0 7px 2px rgba(0, 0, 0, 0.5);
-	font-size: 0.8rem;
+	font-size: 0.9rem;
 	font-family: "Archivo", sans-serif;
-	line-height: 1rem;
+	line-height: 1.2rem;
 }
 
 .channel:hover {

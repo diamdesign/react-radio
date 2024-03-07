@@ -565,7 +565,7 @@ function ChannelDetails({ setAudio }) {
 
 	return (
 		<div id="channels">
-			{channelData && ( // Render JSX only when channelData is available
+			{channelData && (
 				<div id="top">
 					<div className="channel-image">
 						<img src={channelData.channel.image} />
@@ -716,7 +716,7 @@ function ProgramPage() {
 	useEffect(() => {
 		getPrograms().then((data) => {
 			allPrograms = data.programs.slice(0, listAmount);
-			console.log(allPrograms);
+
 			setPrograms(allPrograms);
 			setPlayIndication();
 		});
@@ -743,12 +743,14 @@ function ProgramPage() {
 		<>
 			<div id="channels">
 				<div className="chancontainer">
-					<h1>Program</h1>
 					{isLoading && (
 						<div id="scheduleloader">
 							<div className="loader"></div>
 						</div>
 					)}
+
+					{!isLoading && <h1>Program</h1>}
+
 					{!isLoading &&
 						programs.map((prog, index) => (
 							<div
@@ -781,7 +783,8 @@ function ProgramPage() {
 function ProgramDetails({ setAudio }) {
 	let { programId } = useParams();
 	const [isLoading, setIsLoading] = useState(true);
-	const [programs, setProgram] = useState([]);
+	const [program, setProgram] = useState(null);
+	const navigate = useNavigate();
 
 	async function getProgram(programId) {
 		const response = await fetch(
@@ -789,16 +792,80 @@ function ProgramDetails({ setAudio }) {
 		);
 		const data = await response.json();
 		setIsLoading(false);
-		return data;
+		return data.program;
 	}
 
 	useEffect(() => {
 		getProgram(programId).then((data) => {
 			console.log(data);
+			setProgram(data);
 			setPlayIndication();
+			setIsLoading(false);
 		});
 	}, []);
-	return <></>;
+
+	function handleChanClick(id) {
+		navigate("/kanal/" + id);
+	}
+	function handleCatClick(id) {
+		navigate("/program/category/" + id);
+	}
+
+	return (
+		<>
+			<div id="channels">
+				{isLoading && <div className="loader"></div>}
+				{!isLoading && program && (
+					<div id="top">
+						<div className="channel-image">
+							<img src={program.programimage} />
+						</div>
+						<div className="channel-info" id="proginfo">
+							<h1>{program.name}</h1>
+							{program.channel.name !== "[No channel]" && (
+								<span
+									data-id={program.channel.id}
+									onClick={() => handleChanClick(program.channel.id)}
+									className="chanbutton"
+								>
+									{program.channel.name}
+								</span>
+							)}
+							{program.programcategory.id !== null && (
+								<span
+									data-catid={program.programcategory.id}
+									onClick={() => handleCatClick(program.programcategory.id)}
+									className="chanbutton"
+								>
+									{program.programcategory.name}
+								</span>
+							)}
+							<p>{program.description}</p>
+							<p>{program.broadcastinfo}</p>
+
+							<div className="buttons">
+								<div
+									className="btn-favchan"
+									data-id={program.channel.id}
+									onClick={(e) => handleChanPlay(e, program.id)}
+								></div>
+
+								<a
+									className="website"
+									href={program.programurl}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									Hemsida
+								</a>
+								{program.haspod && <div className="icon-pod"></div>}
+							</div>
+						</div>
+					</div>
+				)}
+			</div>
+		</>
+	);
 }
 
 function Player({ audio }) {
