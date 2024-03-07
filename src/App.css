@@ -52,6 +52,14 @@ body {
 	opacity: 1 !important;
 }
 
+.btn-favchan.favorited {
+	opacity: 1;
+	display: block;
+	background-color: white;
+	filter: invert(0);
+	border: none;
+}
+
 .favorited .btn-favchan,
 .favorited .btn-favprog {
 	opacity: 1;
@@ -234,7 +242,8 @@ body {
 }
 /* Styling the default audio controls */
 
-h1 {
+h1,
+h2 {
 	font-family: "Archivo", sans-serif;
 	font-size: 3rem;
 	display: block;
@@ -244,6 +253,13 @@ h1 {
 	margin-bottom: 1rem;
 	padding-bottom: 1rem;
 	margin-top: 3rem;
+}
+
+h2 {
+	font-size: 2rem;
+	margin-bottom: 0;
+	margin-top: 0;
+	border-bottom: none;
 }
 
 h1 span {
@@ -399,22 +415,38 @@ audio::-webkit-media-controls-fullscreen-button {
 	display: flex;
 }
 
-.channel-info .chanplaybtn {
+.channel-info .btn-favchan {
+	top: 0;
+	left: 0;
+	position: relative;
+	display: block;
+	width: 3rem;
+	height: 3rem;
+	margin-top: 1rem;
+	margin-left: 0.5rem;
+	margin-right: 1rem;
 	border: 1px solid rgba(0, 0, 0, 0.2) !important;
+	border-radius: 0.3rem;
+}
+
+.channel-info .chanplaybtn {
+	border: none !important;
 	height: 3rem;
 	border-radius: 0.3rem;
-
+	filter: invert(0);
+	background-color: white;
 	width: 3rem;
 	height: 3rem;
 	margin-top: 1rem;
 	position: relative;
 	bottom: 0;
 	z-index: 1;
-	opacity: 0.5;
+	opacity: 1;
 }
 
 .channel-info .chanplaybtn:hover,
-.channel-info .website:hover {
+.channel-info .website:hover,
+.channel-info .programs:hover {
 	scale: 1;
 	cursor: pointer;
 	opacity: 1;
@@ -440,7 +472,8 @@ audio::-webkit-media-controls-fullscreen-button {
 	margin-top: 1rem;
 }
 
-.channel-info .website {
+.channel-info .website,
+.channel-info .programs {
 	border: 1px solid rgba(255, 255, 255, 0.2) !important;
 	height: 3rem;
 	color: white;
@@ -448,6 +481,7 @@ audio::-webkit-media-controls-fullscreen-button {
 	line-height: 3rem;
 	padding: 0 1rem;
 	margin-left: 0.5rem;
+	text-decoration: none;
 	height: 3rem;
 	margin-top: 1rem;
 	position: relative;
@@ -461,7 +495,7 @@ audio::-webkit-media-controls-fullscreen-button {
 	width: 100%;
 	min-width: 100%;
 	min-height: calc(100% - 18rem);
-	padding: 2rem;
+	padding: 1rem 2rem 2rem 2rem;
 	display: flex;
 	flex-flow: wrap;
 	flex-direction: column;
@@ -757,6 +791,18 @@ audio::-webkit-media-controls-fullscreen-button {
 .program-item .proginfo {
 	padding: 1rem;
 	position: relative;
+	width: 100%;
+}
+
+.program-item .proginfo .chan {
+	background: rgba(255, 255, 255, 0.2);
+	display: inline-block;
+	padding: 0.2rem 0.5rem;
+	border-radius: 0.3rem;
+	font-size: 0.78rem;
+	position: absolute;
+	bottom: 0.7rem;
+	right: 0.7rem;
 }
 
 .program-item .proginfo .title {

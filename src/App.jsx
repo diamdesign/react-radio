@@ -428,10 +428,12 @@ function ChannelPage({ setAudio }) {
 function ChannelDetails({ setAudio }) {
 	let { channelId } = useParams();
 
+	const navigate = useNavigate();
 	const [page, setPage] = useState(1);
 	const [isLoading, setIsLoading] = useState(true);
 	const [channelData, setChannelData] = useState(null);
 	const [scheduleData, setSchedule] = useState(null);
+	const [showPrograms, setShowPrograms] = useState([]);
 
 	function handleChanPlay(e, id) {
 		e.stopPropagation();
@@ -465,7 +467,7 @@ function ChannelDetails({ setAudio }) {
 				setChannelData(data);
 
 				// Fetch the first page to get total number of pages
-				const firstPageUrl = `https://api.sr.se/v2/scheduledepisodes?channelid=${channelId}&format=json`;
+				const firstPageUrl = `https://api.sr.se/v2/scheduledepisodes?channelid=${channelId}&format=json&size=2000`;
 				const firstResponse = await fetch(firstPageUrl);
 				const firstData = await firstResponse.json();
 
@@ -526,8 +528,20 @@ function ChannelDetails({ setAudio }) {
 			// Ensure data is not null before accessing its properties
 			const blurElement = document.getElementById("colorblur");
 			blurElement.style.background = "#" + data.channel.color;
+
+			const btnfavchan = document.querySelector(".btn-favchan");
+
+			if (favoriteChan.includes(parseInt(channelId))) {
+				btnfavchan.classList.add("favorited");
+			} else {
+				btnfavchan.classList.remove("favorited");
+			}
 		});
 	}, [channelId]);
+
+	function handleProgClick(e, id) {
+		navigate("/program/" + id);
+	}
 
 	return (
 		<div id="channels">
@@ -546,6 +560,16 @@ function ChannelDetails({ setAudio }) {
 								data-id={channelData.channel.id}
 								onClick={(e) => handleChanPlay(e, channelData.channel.id)}
 							></div>
+							<div
+								className="btn-favchan"
+								data-id={channelData.channel.id}
+								onClick={(e) => handleChanPlay(e, channelData.channel.id)}
+							></div>
+							{showPrograms && showPrograms.length > 0 ? (
+								<div className="programs">Dagens schema</div>
+							) : (
+								<div className="programs">Alla program</div>
+							)}
 							<a
 								className="website"
 								href={channelData.channel.siteurl}
@@ -559,35 +583,58 @@ function ChannelDetails({ setAudio }) {
 				</div>
 			)}
 			<div id="schedule">
-				{isLoading && (
-					<div id="scheduleloader">
-						<div className="loader"></div>
-					</div>
+				{showPrograms && showPrograms.length > 0 ? (
+					<>
+						{isLoading && (
+							<div id="scheduleloader">
+								<div className="loader"></div>
+							</div>
+						)}
+						{!isLoading && <h2>Alla program</h2>}
+					</>
+				) : (
+					// Content to render when showPrograms is not set
+					<>
+						{isLoading && (
+							<div id="scheduleloader">
+								<div className="loader"></div>
+							</div>
+						)}
+						{!isLoading && <h2>Dagens schema</h2>}
+						{!isLoading &&
+							scheduleData.map((item, index) => (
+								<div
+									className="schedule-item"
+									key={index}
+									data-progid={item.program.id}
+									onClick={(e) => {
+										handleProgClick(e, item.program.id);
+									}}
+								>
+									<div className="schedule-image">
+										<img src={item.imageurl} />
+									</div>
+									<div className="schedule-info">
+										<h2>{item.program.name}</h2>
+										<p>{item.description}</p>
+										<p>
+											<span>
+												Sänds: {onlyTime(formatTime(item.starttimeutc))} -{" "}
+												{onlyTime(formatTime(item.endtimeutc))}
+											</span>
+										</p>
+									</div>
+								</div>
+							))}
+					</>
 				)}
-				{!isLoading &&
-					scheduleData.map((item, index) => (
-						<div className="schedule-item" key={index} data-progid={item.program.id}>
-							<div className="schedule-image">
-								<img src={item.imageurl} />
-							</div>
-							<div className="schedule-info">
-								<h2>{item.program.name}</h2>
-								<p>{item.description}</p>
-								<p>
-									<span>
-										Sänds: {onlyTime(formatTime(item.starttimeutc))} -{" "}
-										{onlyTime(formatTime(item.endtimeutc))}
-									</span>
-								</p>
-							</div>
-						</div>
-					))}
 			</div>
 		</div>
 	);
 }
 
 function ProgramPage() {
+	let { progId } = useParams();
 	const [isLoading, setIsLoading] = useState(true);
 	const [programs, setPrograms] = useState([]);
 	const [listAmount, setListAmount] = useState(50);
@@ -617,6 +664,7 @@ function ProgramPage() {
 			allPrograms = data.programs.slice(0, listAmount);
 			console.log(allPrograms);
 			setPrograms(allPrograms);
+			setPlayIndication();
 		});
 	}, [listAmount]);
 
@@ -663,6 +711,7 @@ function ProgramPage() {
 									<img src={prog.programimage} alt="" />
 								</div>
 								<div className="proginfo">
+									<div className="chan">{prog.channel.name}</div>
 									<div className="title">{prog.name}</div>
 									<div className="desc">{prog.description}</div>
 									{prog.haspod && <div className="icon-pod"></div>}
@@ -676,6 +725,19 @@ function ProgramPage() {
 }
 
 function ProgramDetails({ setAudio }) {
+	const [isLoading, setIsLoading] = useState(true);
+	const [programs, setProgram] = useState([]);
+
+	async function getProgram() {
+		const response = await fetch("https://api.sr.se/api/v2/programs?format=json&size=10000");
+		const data = await response.json();
+		setIsLoading(false);
+		return data;
+	}
+
+	useEffect(() => {
+		setPlayIndication();
+	}, []);
 	return <></>;
 }
 
